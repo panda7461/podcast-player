@@ -11,26 +11,36 @@ function corsProxyPlugin() {
 
         if (!url) {
           res.statusCode = 400
+          res.setHeader('Content-Type', 'application/json')
           res.end(JSON.stringify({ error: 'URL parameter is required' }))
           return
         }
 
+        console.log('[Proxy] Fetching:', url)
+
         try {
+          const controller = new AbortController()
+          const timeout = setTimeout(() => controller.abort(), 30000) // 30 second timeout
+
           const response = await fetch(url, {
             headers: {
-              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+              'Accept': 'application/rss+xml, application/xml, text/xml, */*',
+              'Accept-Encoding': 'identity', // Disable compression to avoid issues
             },
+            redirect: 'follow',
+            signal: controller.signal,
           })
 
-          // Forward response headers
-          const contentType = response.headers.get('content-type')
-          if (contentType) {
-            res.setHeader('Content-Type', contentType)
-          }
+          clearTimeout(timeout)
 
-          const contentLength = response.headers.get('content-length')
-          if (contentLength) {
-            res.setHeader('Content-Length', contentLength)
+          console.log('[Proxy] Response status:', response.status, response.statusText)
+
+          if (!response.ok) {
+            res.statusCode = response.status
+            res.setHeader('Content-Type', 'application/json')
+            res.end(JSON.stringify({ error: `Upstream error: ${response.status} ${response.statusText}` }))
+            return
           }
 
           // Set CORS headers
@@ -44,12 +54,19 @@ function corsProxyPlugin() {
             return
           }
 
-          // Stream the response
-          const buffer = await response.arrayBuffer()
-          res.end(Buffer.from(buffer))
+          // Read the full response as text to handle encoding properly
+          const text = await response.text()
+          console.log('[Proxy] Response size:', text.length, 'chars')
+
+          // Set content type for XML
+          const contentType = response.headers.get('content-type') || 'application/xml; charset=utf-8'
+          res.setHeader('Content-Type', contentType)
+
+          res.end(text)
         } catch (error) {
-          console.error('Proxy error:', error)
+          console.error('[Proxy] Error:', error.message)
           res.statusCode = 500
+          res.setHeader('Content-Type', 'application/json')
           res.end(JSON.stringify({ error: error.message }))
         }
       })
@@ -60,7 +77,7 @@ function corsProxyPlugin() {
 export default defineConfig({
   plugins: [react(), corsProxyPlugin()],
   server: {
-    host: true, // Listen on all network interfaces (0.0.0.0)
+    host: true,
     port: 5173,
   },
 })

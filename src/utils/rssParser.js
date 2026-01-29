@@ -11,12 +11,32 @@ export async function parseRssFeed(feedUrl) {
   }
 
   const text = await response.text()
+
+  // Debug: log first 500 chars of response
+  console.log('RSS Response (first 500 chars):', text.substring(0, 500))
+
+  // Check if response is HTML (error page) instead of XML
+  if (text.trim().toLowerCase().startsWith('<!doctype') || text.trim().toLowerCase().startsWith('<html')) {
+    throw new Error('フィードの取得に失敗しました（HTMLが返されました）')
+  }
+
+  // Check if response is JSON error
+  if (text.trim().startsWith('{')) {
+    try {
+      const errorJson = JSON.parse(text)
+      throw new Error(errorJson.error || 'プロキシエラーが発生しました')
+    } catch (e) {
+      if (e.message.includes('プロキシ')) throw e
+    }
+  }
+
   const parser = new DOMParser()
   const xml = parser.parseFromString(text, 'application/xml')
 
   const parserError = xml.querySelector('parsererror')
   if (parserError) {
-    throw new Error('Failed to parse RSS feed: Invalid XML')
+    console.error('XML Parse Error:', parserError.textContent)
+    throw new Error('RSSフィードの解析に失敗しました')
   }
 
   const channel = xml.querySelector('channel')
