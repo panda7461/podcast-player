@@ -1,4 +1,4 @@
-import { createContext, useContext, useReducer, useEffect, useCallback } from 'react'
+import { createContext, useContext, useReducer, useEffect, useCallback, useRef } from 'react'
 import { useAudio } from '../hooks/useAudio'
 import { useLocalStorage } from '../hooks/useLocalStorage'
 import { useOfflineStorage } from '../hooks/useOfflineStorage'
@@ -69,7 +69,15 @@ function playerReducer(state, action) {
 
 export function PlayerProvider({ children }) {
   const [state, dispatch] = useReducer(playerReducer, initialState)
-  const audio = useAudio()
+  const playNextRef = useRef()
+
+  const handleEnded = useCallback(() => {
+    if (playNextRef.current) {
+      playNextRef.current()
+    }
+  }, [])
+
+  const audio = useAudio(handleEnded)
   const [savedState, setSavedState] = useLocalStorage('podcast-player-state', null)
   const offlineStorage = useOfflineStorage()
 
@@ -178,6 +186,11 @@ export function PlayerProvider({ children }) {
       playEpisode(state.playlist[prevIndex])
     }
   }, [state.playlist, state.currentEpisode, playEpisode])
+
+  // Update playNextRef when playNext changes
+  useEffect(() => {
+    playNextRef.current = playNext
+  }, [playNext])
 
   const value = {
     ...state,

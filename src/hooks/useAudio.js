@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 
-export function useAudio() {
+export function useAudio(onEnded) {
   const audioRef = useRef(new Audio())
   const [isPlaying, setIsPlaying] = useState(false)
   const [duration, setDuration] = useState(0)
@@ -8,6 +8,11 @@ export function useAudio() {
   const [volume, setVolumeState] = useState(1)
   const [playbackRate, setPlaybackRateState] = useState(1)
   const [isLoading, setIsLoading] = useState(false)
+  const onEndedRef = useRef(onEnded)
+
+  useEffect(() => {
+    onEndedRef.current = onEnded
+  }, [onEnded])
 
   useEffect(() => {
     const audio = audioRef.current
@@ -24,6 +29,9 @@ export function useAudio() {
     const handleEnded = () => {
       setIsPlaying(false)
       setCurrentTime(0)
+      if (onEndedRef.current) {
+        onEndedRef.current()
+      }
     }
 
     const handlePlay = () => setIsPlaying(true)
