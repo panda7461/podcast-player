@@ -63,9 +63,9 @@ export function useAudio(onEnded) {
     setIsLoading(true)
     audio.src = src
     audio.currentTime = startTime
-    audio.playbackRate = playbackRateState
+    audio.playbackRate = playbackRate
     audio.load()
-  }, [playbackRateState])
+  }, [playbackRate])
 
   const play = useCallback(async () => {
     try {
