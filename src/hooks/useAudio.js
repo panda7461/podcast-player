@@ -9,10 +9,15 @@ export function useAudio(onEnded) {
   const [playbackRate, setPlaybackRateState] = useState(1)
   const [isLoading, setIsLoading] = useState(false)
   const onEndedRef = useRef(onEnded)
+  const playbackRateRef = useRef(playbackRate)
 
   useEffect(() => {
     onEndedRef.current = onEnded
   }, [onEnded])
+
+  useEffect(() => {
+    playbackRateRef.current = playbackRate
+  }, [playbackRate])
 
   useEffect(() => {
     const audio = audioRef.current
@@ -37,7 +42,10 @@ export function useAudio(onEnded) {
     const handlePlay = () => setIsPlaying(true)
     const handlePause = () => setIsPlaying(false)
     const handleWaiting = () => setIsLoading(true)
-    const handleCanPlay = () => setIsLoading(false)
+    const handleCanPlay = () => {
+      setIsLoading(false)
+      audio.playbackRate = playbackRateRef.current
+    }
 
     audio.addEventListener('loadedmetadata', handleLoadedMetadata)
     audio.addEventListener('timeupdate', handleTimeUpdate)
@@ -63,9 +71,8 @@ export function useAudio(onEnded) {
     setIsLoading(true)
     audio.src = src
     audio.currentTime = startTime
-    audio.playbackRate = playbackRate
     audio.load()
-  }, [playbackRate])
+  }, [])
 
   const play = useCallback(async () => {
     try {
