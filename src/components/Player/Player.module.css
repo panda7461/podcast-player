@@ -1,0 +1,209 @@
+.player {
+  background: #1a1a2e;
+  border-radius: 12px;
+  padding: 20px;
+  color: #fff;
+}
+
+.empty {
+  text-align: center;
+  color: #888;
+  padding: 40px;
+}
+
+.episodeInfo {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.artwork {
+  width: 64px;
+  height: 64px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: #333;
+}
+
+.textInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.title {
+  font-weight: 600;
+  font-size: 16px;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.podcast {
+  font-size: 14px;
+  color: #888;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.progressContainer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.time {
+  font-size: 12px;
+  color: #888;
+  min-width: 45px;
+  text-align: center;
+}
+
+.progressBar {
+  flex: 1;
+  height: 6px;
+  background: #333;
+  border-radius: 3px;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.progress {
+  height: 100%;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  border-radius: 3px;
+  transition: width 0.1s ease;
+}
+
+.controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.controlBtn {
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  transition: background 0.2s, transform 0.1s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.controlBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.controlBtn:active {
+  transform: scale(0.95);
+}
+
+.controlBtn svg {
+  width: 24px;
+  height: 24px;
+}
+
+.playBtn {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  width: 56px;
+  height: 56px;
+}
+
+.playBtn:hover {
+  background: linear-gradient(135deg, #7b91ed, #8a5db5);
+}
+
+.playBtn svg {
+  width: 28px;
+  height: 28px;
+}
+
+.playBtn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.extraControls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+}
+
+.rateBtn {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.rateBtn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.volumeControl {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.volumeIcon {
+  width: 20px;
+  height: 20px;
+  color: #888;
+}
+
+.volumeSlider {
+  width: 80px;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: #333;
+  border-radius: 2px;
+  outline: none;
+}
+
+.volumeSlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #fff;
+  cursor: pointer;
+}
+
+.volumeSlider::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #fff;
+  cursor: pointer;
+  border: none;
+}

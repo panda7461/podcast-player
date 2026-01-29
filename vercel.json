@@ -1,0 +1,16 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "framework": "vite",
+  "rewrites": [
+    {
+      "source": "/api/proxy",
+      "destination": "/api/proxy"
+    }
+  ],
+  "functions": {
+    "api/proxy.js": {
+      "maxDuration": 60
+    }
+  }
+}
