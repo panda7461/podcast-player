@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import styles from './AdBanner.module.css'
 
-function AdBanner({ slot, format = 'auto', responsive = true }) {
+function AdBanner({ slot, format = 'horizontal', responsive = true }) {
   const adRef = useRef(null)
   const isAdLoaded = useRef(false)
 
