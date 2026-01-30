@@ -4,17 +4,14 @@
   left: 0;
   right: 0;
   width: 100%;
-  min-height: 50px;
+  height: 100px;
   display: flex;
   justify-content: center;
   align-items: center;
   background: #fff;
   border-top: 1px solid #eee;
   z-index: 90;
-}
-
-.adContainer.withMiniPlayer {
-  bottom: 140px; /* Above navigation + mini player */
+  overflow: hidden;
 }
 
 .adContainer ins {

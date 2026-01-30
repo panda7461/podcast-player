@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import styles from './AdBanner.module.css'
 
-function AdBanner({ slot, format = 'auto', responsive = true, hasMiniPlayer = false }) {
+function AdBanner({ slot, format = 'auto', responsive = true }) {
   const adRef = useRef(null)
   const isAdLoaded = useRef(false)
 
@@ -17,7 +17,7 @@ function AdBanner({ slot, format = 'auto', responsive = true, hasMiniPlayer = fa
   }, [])
 
   return (
-    <div className={`${styles.adContainer} ${hasMiniPlayer ? styles.withMiniPlayer : ''}`}>
+    <div className={styles.adContainer}>
       <ins
         className="adsbygoogle"
         ref={adRef}

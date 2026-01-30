@@ -71,7 +71,7 @@ function App() {
 
       {/* AdSense Banner */}
       {activeTab !== TABS.PLAYER && (
-        <AdBanner slot={AD_SLOT_ID} hasMiniPlayer={!!currentEpisode} />
+        <AdBanner slot={AD_SLOT_ID} />
       )}
 
       {/* Bottom Navigation */}
