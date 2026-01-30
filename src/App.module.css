@@ -22,13 +22,13 @@ body {
 .main {
   flex: 1;
   overflow-y: auto;
-  padding-bottom: 260px; /* Space for ad banner (100px) + mini player (80px) + nav (60px) + margin */
+  padding-bottom: 210px; /* Space for ad banner (50px) + mini player (80px) + nav (60px) + margin */
 }
 
 /* Mini Player */
 .miniPlayer {
   position: fixed;
-  bottom: 160px; /* Above navigation + ad banner */
+  bottom: 110px; /* Above navigation (60px) + ad banner (50px) */
   left: 0;
   right: 0;
   background: #fff;
