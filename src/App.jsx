@@ -4,8 +4,12 @@ import PodcastList from './components/PodcastList/PodcastList'
 import EpisodeList from './components/EpisodeList/EpisodeList'
 import Playlist from './components/Playlist/Playlist'
 import AddFeed from './components/AddFeed/AddFeed'
+import AdBanner from './components/AdBanner/AdBanner'
 import { usePlayer } from './context/PlayerContext'
 import styles from './App.module.css'
+
+// AdSense広告スロットID（AdSense管理画面で取得して設定してください）
+const AD_SLOT_ID = 'YOUR_AD_SLOT_ID'
 
 const TABS = {
   SEARCH: 'search',
@@ -63,6 +67,11 @@ function App() {
         <div className={styles.miniPlayer} onClick={() => setActiveTab(TABS.PLAYER)}>
           <Player mini />
         </div>
+      )}
+
+      {/* AdSense Banner */}
+      {activeTab !== TABS.PLAYER && (
+        <AdBanner slot={AD_SLOT_ID} hasMiniPlayer={!!currentEpisode} />
       )}
 
       {/* Bottom Navigation */}

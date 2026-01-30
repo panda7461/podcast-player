@@ -22,7 +22,7 @@ body {
 .main {
   flex: 1;
   overflow-y: auto;
-  padding-bottom: 140px; /* Space for mini player + nav */
+  padding-bottom: 200px; /* Space for ad banner + mini player + nav */
 }
 
 /* Mini Player */
