@@ -99,18 +99,50 @@ export function PlayerProvider({ children }) {
     setSavedState(stateToSave)
   }, [state.podcasts, state.playlist, state.favorites, state.playbackPositions, setSavedState])
 
-  // Save playback position periodically
+  // Save playback position periodically and on pause/unload
+  const currentEpisodeRef = useRef(state.currentEpisode)
+  const currentTimeRef = useRef(audio.currentTime)
+
   useEffect(() => {
-    if (state.currentEpisode && audio.currentTime > 0) {
-      const interval = setInterval(() => {
-        dispatch({
-          type: 'UPDATE_PLAYBACK_POSITION',
-          payload: { guid: state.currentEpisode.guid, position: audio.currentTime },
-        })
-      }, 5000)
+    currentEpisodeRef.current = state.currentEpisode
+  }, [state.currentEpisode])
+
+  useEffect(() => {
+    currentTimeRef.current = audio.currentTime
+  }, [audio.currentTime])
+
+  const saveCurrentPosition = useCallback(() => {
+    if (currentEpisodeRef.current && currentTimeRef.current > 0) {
+      dispatch({
+        type: 'UPDATE_PLAYBACK_POSITION',
+        payload: { guid: currentEpisodeRef.current.guid, position: currentTimeRef.current },
+      })
+    }
+  }, [])
+
+  // Save position every 5 seconds while playing
+  useEffect(() => {
+    if (state.currentEpisode && audio.isPlaying) {
+      const interval = setInterval(saveCurrentPosition, 5000)
       return () => clearInterval(interval)
     }
-  }, [state.currentEpisode, audio.currentTime])
+  }, [state.currentEpisode, audio.isPlaying, saveCurrentPosition])
+
+  // Save position when paused
+  useEffect(() => {
+    if (state.currentEpisode && !audio.isPlaying && audio.currentTime > 0) {
+      saveCurrentPosition()
+    }
+  }, [audio.isPlaying, state.currentEpisode, audio.currentTime, saveCurrentPosition])
+
+  // Save position before page unload
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      saveCurrentPosition()
+    }
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
+  }, [saveCurrentPosition])
 
   const playEpisode = useCallback(async (episode) => {
     dispatch({ type: 'SET_CURRENT_EPISODE', payload: episode })
@@ -124,6 +156,14 @@ export function PlayerProvider({ children }) {
         audioSrc = offlineUrl
       }
     }
+
+    // Update Media Session metadata for background playback
+    audio.updateMediaSession({
+      title: episode.title,
+      artist: episode.podcastTitle,
+      podcastTitle: episode.podcastTitle,
+      artwork: episode.image || episode.podcastImage
+    })
 
     audio.loadAudio(audioSrc, savedPosition)
     audio.play()
@@ -191,6 +231,14 @@ export function PlayerProvider({ children }) {
   useEffect(() => {
     playNextRef.current = playNext
   }, [playNext])
+
+  // Setup Media Session handlers for background playback controls
+  useEffect(() => {
+    audio.setMediaSessionHandlers({
+      onPrevious: () => playPrevious(),
+      onNext: () => playNext()
+    })
+  }, [audio, playNext, playPrevious])
 
   const value = {
     ...state,

@@ -3,7 +3,7 @@ import { usePlayer } from '../../context/PlayerContext'
 import { parseRssFeed } from '../../utils/rssParser'
 import styles from './AddFeed.module.css'
 
-export default function AddFeed() {
+export default function AddFeed({ onPodcastAdded }) {
   const [mode, setMode] = useState('search') // 'search' or 'url'
   const [query, setQuery] = useState('')
   const [url, setUrl] = useState('')
@@ -60,6 +60,7 @@ export default function AddFeed() {
       addPodcast(parsedPodcast)
       setQuery('')
       setSearchResults([])
+      onPodcastAdded?.()
     } catch (err) {
       setError(err.message || 'フィードの取得に失敗しました')
     } finally {
@@ -85,6 +86,7 @@ export default function AddFeed() {
       const podcast = await parseRssFeed(feedUrl)
       addPodcast(podcast)
       setUrl('')
+      onPodcastAdded?.()
     } catch (err) {
       setError(err.message || 'フィードの取得に失敗しました')
     } finally {

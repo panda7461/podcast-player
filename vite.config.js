@@ -20,13 +20,13 @@ function corsProxyPlugin() {
 
         try {
           const controller = new AbortController()
-          const timeout = setTimeout(() => controller.abort(), 30000) // 30 second timeout
+          const timeout = setTimeout(() => controller.abort(), 120000) // 2 minute timeout for large files
 
           const response = await fetch(url, {
             headers: {
               'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-              'Accept': 'application/rss+xml, application/xml, text/xml, */*',
-              'Accept-Encoding': 'identity', // Disable compression to avoid issues
+              'Accept': '*/*',
+              'Accept-Encoding': 'identity',
             },
             redirect: 'follow',
             signal: controller.signal,
@@ -54,15 +54,33 @@ function corsProxyPlugin() {
             return
           }
 
-          // Read the full response as text to handle encoding properly
-          const text = await response.text()
-          console.log('[Proxy] Response size:', text.length, 'chars')
-
-          // Set content type for XML
-          const contentType = response.headers.get('content-type') || 'application/xml; charset=utf-8'
+          const contentType = response.headers.get('content-type') || 'application/octet-stream'
           res.setHeader('Content-Type', contentType)
 
-          res.end(text)
+          // Forward content-length if available
+          const contentLength = response.headers.get('content-length')
+          if (contentLength) {
+            res.setHeader('Content-Length', contentLength)
+          }
+
+          // Check if this is binary content (audio, video, etc.)
+          const isBinary = contentType.startsWith('audio/') ||
+                          contentType.startsWith('video/') ||
+                          contentType.startsWith('application/octet-stream') ||
+                          url.match(/\.(mp3|mp4|m4a|ogg|wav|webm|aac)(\?|$)/i)
+
+          if (isBinary) {
+            // Handle binary data (audio files)
+            console.log('[Proxy] Streaming binary content')
+            const buffer = await response.arrayBuffer()
+            console.log('[Proxy] Binary size:', buffer.byteLength, 'bytes')
+            res.end(Buffer.from(buffer))
+          } else {
+            // Handle text data (RSS feeds, etc.)
+            const text = await response.text()
+            console.log('[Proxy] Text size:', text.length, 'chars')
+            res.end(text)
+          }
         } catch (error) {
           console.error('[Proxy] Error:', error.message)
           res.statusCode = 500

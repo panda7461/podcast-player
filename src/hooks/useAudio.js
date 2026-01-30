@@ -10,6 +10,7 @@ export function useAudio(onEnded) {
   const [isLoading, setIsLoading] = useState(false)
   const onEndedRef = useRef(onEnded)
   const playbackRateRef = useRef(playbackRate)
+  const mediaSessionHandlersRef = useRef({})
 
   useEffect(() => {
     onEndedRef.current = onEnded
@@ -114,6 +115,65 @@ export function useAudio(onEnded) {
     seek(newTime)
   }, [duration, seek])
 
+  // Media Session API for background playback on Android
+  const updateMediaSession = useCallback((metadata) => {
+    if ('mediaSession' in navigator) {
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: metadata.title || 'Unknown Episode',
+        artist: metadata.artist || metadata.podcastTitle || 'Unknown Podcast',
+        album: metadata.podcastTitle || '',
+        artwork: metadata.artwork ? [
+          { src: metadata.artwork, sizes: '512x512', type: 'image/jpeg' }
+        ] : []
+      })
+    }
+  }, [])
+
+  const setMediaSessionHandlers = useCallback((handlers) => {
+    mediaSessionHandlersRef.current = handlers
+    if ('mediaSession' in navigator) {
+      navigator.mediaSession.setActionHandler('play', () => {
+        play()
+        handlers.onPlay?.()
+      })
+      navigator.mediaSession.setActionHandler('pause', () => {
+        pause()
+        handlers.onPause?.()
+      })
+      navigator.mediaSession.setActionHandler('seekbackward', () => {
+        skip(-10)
+        handlers.onSeekBackward?.()
+      })
+      navigator.mediaSession.setActionHandler('seekforward', () => {
+        skip(10)
+        handlers.onSeekForward?.()
+      })
+      navigator.mediaSession.setActionHandler('previoustrack', () => {
+        handlers.onPrevious?.()
+      })
+      navigator.mediaSession.setActionHandler('nexttrack', () => {
+        handlers.onNext?.()
+      })
+      navigator.mediaSession.setActionHandler('seekto', (details) => {
+        if (details.seekTime !== undefined) {
+          seek(details.seekTime)
+          handlers.onSeekTo?.(details.seekTime)
+        }
+      })
+    }
+  }, [play, pause, skip, seek])
+
+  // Update Media Session position state
+  useEffect(() => {
+    if ('mediaSession' in navigator && duration > 0) {
+      navigator.mediaSession.setPositionState({
+        duration: duration,
+        playbackRate: playbackRate,
+        position: currentTime
+      })
+    }
+  }, [currentTime, duration, playbackRate])
+
   return {
     isPlaying,
     duration,
@@ -129,5 +189,7 @@ export function useAudio(onEnded) {
     setVolume,
     setPlaybackRate,
     skip,
+    updateMediaSession,
+    setMediaSessionHandlers,
   }
 }

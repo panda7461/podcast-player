@@ -13,122 +13,85 @@ body {
 
 .app {
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
-}
-
-.header {
-  background: #fff;
-  padding: 16px 24px;
-  border-bottom: 1px solid #eee;
-}
-
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 20px;
-  font-weight: 700;
-  color: #333;
-}
-
-.logoIcon {
-  width: 28px;
-  height: 28px;
-  color: #667eea;
+  background: #f5f6f8;
 }
 
 .main {
   flex: 1;
-  display: flex;
-  gap: 24px;
-  padding: 24px;
-  max-width: 1400px;
-  margin: 0 auto;
-  width: 100%;
+  overflow-y: auto;
+  padding-bottom: 140px; /* Space for mini player + nav */
 }
 
-.sidebar {
-  width: 350px;
+/* Mini Player */
+.miniPlayer {
+  position: fixed;
+  bottom: 60px;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border-top: 1px solid #eee;
+  z-index: 100;
+  cursor: pointer;
+}
+
+/* Bottom Navigation */
+.nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  background: #fff;
+  border-top: 1px solid #eee;
+  padding-bottom: env(safe-area-inset-bottom);
+  z-index: 200;
+}
+
+.navButton {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px 4px;
+  background: none;
+  border: none;
+  color: #999;
+  font-size: 10px;
+  cursor: pointer;
+  transition: color 0.2s;
 }
 
-.content {
-  flex: 1;
-  min-width: 0;
+.navButton svg {
+  width: 24px;
+  height: 24px;
 }
 
-.footer {
-  position: sticky;
-  bottom: 0;
-  padding: 16px 24px;
-  background: transparent;
+.navButton.active {
+  color: #667eea;
 }
 
-.footer > * {
-  max-width: 1000px;
-  margin: 0 auto;
+.navButton.playing svg {
+  animation: pulse 1.5s ease-in-out infinite;
 }
 
-/* Responsive Design */
-@media (max-width: 1024px) {
-  .main {
-    flex-direction: column;
-    padding: 16px;
-    gap: 16px;
-  }
-
-  .sidebar {
-    width: 100%;
-    flex-direction: row;
-    flex-wrap: wrap;
-  }
-
-  .sidebar > * {
-    flex: 1;
-    min-width: 280px;
-  }
-}
-
-@media (max-width: 640px) {
-  .header {
-    padding: 12px 16px;
-  }
-
-  .logo {
-    font-size: 18px;
-  }
-
-  .main {
-    padding: 12px;
-    gap: 12px;
-  }
-
-  .sidebar {
-    flex-direction: column;
-  }
-
-  .sidebar > * {
-    min-width: 100%;
-  }
-
-  .footer {
-    padding: 12px;
-  }
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
 }
 
 /* Scrollbar styling */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 4px;
+  height: 4px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 4px;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
